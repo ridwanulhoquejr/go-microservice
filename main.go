@@ -1,9 +1,12 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
+	"time"
 
 	"github.com/ridwanulhoquejr/go-microservice/handlers"
 )
@@ -29,10 +32,31 @@ func main() {
 	// 	fmt.Println("Goodbye registering ServeMux with handleFunc method")
 	// })
 
-	// then passing our own serveMux to the listenAndServe to handle which handleFunc would be executed
-	err := http.ListenAndServe(":8080", sm)
-
-	if err != nil {
-		log.Printf("Error while connecting to the TCP connection; %s", err)
+	// add some configurations in http.Server
+	s := &http.Server{
+		Addr:         ":8080",
+		Handler:      sm,
+		IdleTimeout:  120 * time.Second,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 5 * time.Second,
 	}
+
+	go func() {
+		err := s.ListenAndServe()
+		if err != nil {
+			log.Fatalf("Error while connecting to the TCP connection; %s", err)
+		}
+	}()
+
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	sig := <-c
+
+	l.Println("Recieved terminate, graceful shutdown", sig)
+
+	tc, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	s.Shutdown(tc)
+	log.Println("shut down gracefully")
 }
