@@ -45,7 +45,9 @@ func (p *Product) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 // Get Products
 func (p *Product) GetProduct(w http.ResponseWriter, r *http.Request) {
 
+	// get the dummy products
 	lp := data.GetProducts()
+	// conver Go-Struct into JSON
 	err := lp.ToJSON(w)
 
 	if err != nil {
@@ -64,7 +66,9 @@ func (p *Product) AddProduct(w http.ResponseWriter, r *http.Request) {
 
 	p.l.Println("Handle POST method")
 
+	// a ref of our Product struct for recieving the args
 	prod := &data.Product{}
+	// convert it to the JSON format
 	err := prod.FromJSON(r)
 
 	if err != nil {
@@ -76,6 +80,8 @@ func (p *Product) AddProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	p.l.Printf("Prod: %#v", prod)
+
+	// add the incoming req into our dummy Product
 	data.AddProduct(prod)
 }
 

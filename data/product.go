@@ -65,6 +65,7 @@ func AddProduct(p *Product) {
 	productList = append(productList, p)
 }
 
+// for generating the AUTO INCREMENTAL product-id
 func getNextID() int {
 
 	// grab the last index of the product
