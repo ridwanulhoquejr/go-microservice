@@ -1,0 +1,6 @@
+{
+    "json.schemas": [],
+    "gopls": {
+        "ui.semanticTokens": true
+    }
+}
