@@ -48,11 +48,33 @@ func GetProducts() Products {
 	return productList
 }
 
+// ? interface for common ToJSON parsing
+// idea is to parse the JSON from go-struct of a single or slice of products
+// for that i wrote an interface, and implement this with (*Product) and (*Products)
+// and a seperate function for core functionlity which is return by the implemented method
+type JSON interface {
+	ToJSON(w http.ResponseWriter) error
+}
+
+// ToJSON method for a single Product
+func (p *Product) ToJSON(w http.ResponseWriter) error {
+	return encodeJSON(w, p)
+}
+
 // ToJSON method of Products
-func (p *Products) ToJSON(w http.ResponseWriter) error {
+func (ps *Products) ToJSON(w http.ResponseWriter) error {
+	return encodeJSON(w, ps)
+}
+
+func encodeJSON(w http.ResponseWriter, v any) error {
 	w.Header().Set("Content-Type", "application/json")
 	e := json.NewEncoder(w)
-	return e.Encode(p)
+	return e.Encode(v)
+}
+
+// this will be used in call side
+func WriteJSON(w http.ResponseWriter, v JSON) error {
+	return v.ToJSON(w)
 }
 
 func (p *Product) FromJSON(r *http.Request) error {

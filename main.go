@@ -8,8 +8,11 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/gorilla/mux"
 	"github.com/ridwanulhoquejr/go-microservice/handlers"
 )
+
+// const bindAddr = env.String("BIND_ADDRESS", false, ":8080", "Bind address for the server")
 
 func main() {
 
@@ -20,10 +23,11 @@ func main() {
 
 	// then creating our own ServeMux
 	// This ServeMux actually binding our route-path with the handler func we defined for each specific route
-	sm := http.NewServeMux()
+	sm := mux.NewRouter()
 
 	// then, we are saying bind (handle) this specific route-path ("/") with HelloHandler (hh)
-	sm.Handle("/product", ph)
+	sm.HandleFunc("/product/get", ph.GetProduct).Methods("GET")
+	sm.HandleFunc("/product/create", ph.AddProduct).Methods("POST")
 
 	//! alternative way to declare and register a func with route-path
 	// sm.HandleFunc("/goodbye", func(w http.ResponseWriter, r *http.Request) {

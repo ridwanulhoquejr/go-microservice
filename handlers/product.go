@@ -23,24 +23,25 @@ func NewProduct(l *log.Logger) *Product {
 	}
 }
 
-func (p *Product) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+//! these below blocks are needed for built-in net/http
+// func (p *Product) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
-	if r.Method == http.MethodGet {
-		p.GetProduct(w, r)
-		return
-	}
-	if r.Method == http.MethodPost {
-		p.AddProduct(w, r)
-		return
-	}
+// 	if r.Method == http.MethodGet {
+// 		p.GetProduct(w, r)
+// 		return
+// 	}
+// 	if r.Method == http.MethodPost {
+// 		p.AddProduct(w, r)
+// 		return
+// 	}
 
-	// catch all
-	WriteError(
-		w,
-		http.StatusMethodNotAllowed,
-		"Method not allowed",
-	)
-}
+// 	// catch all
+// 	WriteError(
+// 		w,
+// 		http.StatusMethodNotAllowed,
+// 		"Method not allowed",
+// 	)
+// }
 
 // Get Products
 func (p *Product) GetProduct(w http.ResponseWriter, r *http.Request) {
@@ -48,7 +49,7 @@ func (p *Product) GetProduct(w http.ResponseWriter, r *http.Request) {
 	// get the dummy products
 	lp := data.GetProducts()
 	// conver Go-Struct into JSON
-	err := lp.ToJSON(w)
+	err := data.WriteJSON(w, &lp)
 
 	if err != nil {
 		WriteError(
@@ -83,6 +84,19 @@ func (p *Product) AddProduct(w http.ResponseWriter, r *http.Request) {
 
 	// add the incoming req into our dummy Product
 	data.AddProduct(prod)
+
+	// sending back the product just created as a response
+	err = data.WriteJSON(w, prod)
+
+	if err != nil {
+		WriteError(
+			w,
+			http.StatusMethodNotAllowed,
+			"Internal Server Error",
+		)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
 }
 
 func WriteError(w http.ResponseWriter, code int, details string) {
