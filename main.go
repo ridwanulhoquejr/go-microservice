@@ -28,6 +28,7 @@ func main() {
 	// then, we are saying bind (handle) this specific route-path ("/") with HelloHandler (hh)
 	sm.HandleFunc("/product/get", ph.GetProduct).Methods("GET")
 	sm.HandleFunc("/product/create", ph.AddProduct).Methods("POST")
+	sm.HandleFunc("/product/{id}", ph.UpdateProduct).Methods("PUT")
 
 	//! alternative way to declare and register a func with route-path
 	// sm.HandleFunc("/goodbye", func(w http.ResponseWriter, r *http.Request) {

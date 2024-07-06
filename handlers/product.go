@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 
+	"github.com/gorilla/mux"
 	"github.com/ridwanulhoquejr/go-microservice/data"
 )
 
@@ -97,6 +99,57 @@ func (p *Product) AddProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
+}
+
+// update product
+func (p *Product) UpdateProduct(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)["id"]
+	id, err := strconv.Atoi(vars)
+
+	if err != nil {
+		WriteError(
+			w,
+			http.StatusBadRequest,
+			"Invalid id given",
+		)
+		return
+	}
+
+	prod := &data.Product{}
+	err = prod.FromJSON(r)
+
+	if err != nil {
+		WriteError(
+			w,
+			http.StatusBadRequest,
+			"Unable to unmarshal the JSON object",
+		)
+		return
+	}
+	err = data.UpdateProduct(id, prod)
+	if err != nil {
+		WriteError(
+			w,
+			http.StatusNotFound,
+			"The product not found for the given id",
+		)
+	}
+
+	// get all the products
+	// ps := data.GetProducts()
+	// sending back the product just created as a response
+	err = data.WriteJSON(w, prod)
+
+	if err != nil {
+		WriteError(
+			w,
+			http.StatusMethodNotAllowed,
+			"Internal Server Error",
+		)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+
 }
 
 func WriteError(w http.ResponseWriter, code int, details string) {

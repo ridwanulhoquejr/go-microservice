@@ -2,6 +2,7 @@ package data
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 )
@@ -95,4 +96,39 @@ func getNextID() int {
 
 	// add +1 for uniqueness
 	return lp.Id + 1
+}
+
+// type UpdateProductParams struct {
+// 	Name        string  `json:"name"`
+// 	Description string  `json:"description"`
+// 	SKU         string  `json:"sku"`
+// 	Price       float32 `json:"price"`
+// }
+
+func UpdateProduct(id int, p *Product) error {
+	fp, i, err := findProduct(id)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("product found at position %d %#v \n", i, fp)
+	fmt.Printf("product in payload %#v", p)
+
+	p.Id = id
+	productList[i] = p
+
+	return nil
+}
+
+var ErrProductNotFound = fmt.Errorf("Product not found")
+
+func findProduct(id int) (*Product, int, error) {
+
+	for i, p := range productList {
+		if p.Id == id {
+			return p, i, nil
+
+		}
+	}
+	return nil, 0, ErrProductNotFound
 }
