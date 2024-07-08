@@ -25,10 +25,15 @@ func main() {
 	// This ServeMux actually binding our route-path with the handler func we defined for each specific route
 	sm := mux.NewRouter()
 
+	// use the JSONMiddlerWare
+	sm.Use(handlers.JSONMiddleware)
+	sm.Use(handlers.LoggingMiddleware)
+	sm.Use(handlers.TimeoutMiddleware)
+
 	// then, we are saying bind (handle) this specific route-path ("/") with HelloHandler (hh)
 	sm.HandleFunc("/product/get", ph.GetProduct).Methods("GET")
 	sm.HandleFunc("/product/create", ph.AddProduct).Methods("POST")
-	sm.HandleFunc("/product/{id}", ph.UpdateProduct).Methods("PUT")
+	sm.HandleFunc("/product/update/{id:[0-9]+}", ph.UpdateProduct).Methods("PUT")
 
 	//! alternative way to declare and register a func with route-path
 	// sm.HandleFunc("/goodbye", func(w http.ResponseWriter, r *http.Request) {

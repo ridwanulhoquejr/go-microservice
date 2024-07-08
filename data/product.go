@@ -67,13 +67,16 @@ func (ps *Products) ToJSON(w http.ResponseWriter) error {
 	return encodeJSON(w, ps)
 }
 
+// This function is common for all the methods, who implement ToJSON interface
 func encodeJSON(w http.ResponseWriter, v any) error {
-	w.Header().Set("Content-Type", "application/json")
+	//? no longeer to use w.Header(), we use JSONMiddleware for this
+	// w.Header().Set("Content-Type", "application/json")
 	e := json.NewEncoder(w)
 	return e.Encode(v)
 }
 
 // this will be used in call side
+// just need t call the ToJSON method, interface will determine which one to call
 func WriteJSON(w http.ResponseWriter, v JSON) error {
 	return v.ToJSON(w)
 }
@@ -127,7 +130,6 @@ func findProduct(id int) (*Product, int, error) {
 	for i, p := range productList {
 		if p.Id == id {
 			return p, i, nil
-
 		}
 	}
 	return nil, 0, ErrProductNotFound

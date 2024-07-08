@@ -25,26 +25,6 @@ func NewProduct(l *log.Logger) *Product {
 	}
 }
 
-//! these below blocks are needed for built-in net/http
-// func (p *Product) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-
-// 	if r.Method == http.MethodGet {
-// 		p.GetProduct(w, r)
-// 		return
-// 	}
-// 	if r.Method == http.MethodPost {
-// 		p.AddProduct(w, r)
-// 		return
-// 	}
-
-// 	// catch all
-// 	WriteError(
-// 		w,
-// 		http.StatusMethodNotAllowed,
-// 		"Method not allowed",
-// 	)
-// }
-
 // Get Products
 func (p *Product) GetProduct(w http.ResponseWriter, r *http.Request) {
 
@@ -103,6 +83,7 @@ func (p *Product) AddProduct(w http.ResponseWriter, r *http.Request) {
 
 // update product
 func (p *Product) UpdateProduct(w http.ResponseWriter, r *http.Request) {
+	// take the id from the request-payload
 	vars := mux.Vars(r)["id"]
 	id, err := strconv.Atoi(vars)
 
@@ -133,6 +114,7 @@ func (p *Product) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 			http.StatusNotFound,
 			"The product not found for the given id",
 		)
+		return
 	}
 
 	// get all the products
@@ -153,7 +135,8 @@ func (p *Product) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 }
 
 func WriteError(w http.ResponseWriter, code int, details string) {
-	w.Header().Set("Content-Type", "application/json")
+	//? no longeer to use w.Header(), we use JSONMiddleware for this
+	// w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 	json.NewEncoder(w).Encode(
 		Error{

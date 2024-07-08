@@ -1,4 +1,7 @@
 server:
 	go run main.go
 
-.PHONY: server
+mod:
+	go mod tidy
+
+.PHONY: server, mod
